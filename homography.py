@@ -38,12 +38,16 @@ def get_image_pairs(directory):
         kp1, des1 = sift.detectAndCompute(img1, None)
         kp2, des2 = sift.detectAndCompute(img2, None)
 
+        if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+            print(f"Não foram encontrados suficientes keypoints em {img_path1} ou {img_path2}. Pulando este par.")
+            continue
+
         # Usando FLANN como matcher, que é mais adequado para SIFT/SURF
         FLANN_INDEX_KDTREE = 0
         index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
         search_params = dict(checks=50)
         flann = cv2.FlannBasedMatcher(index_params, search_params)
-
+        
         matches = flann.knnMatch(des1, des2, k=2)
 
         # Filtrando as correspondências usando a razão de Lowe
